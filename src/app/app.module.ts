@@ -10,12 +10,16 @@ import {
   MatInputModule,
   MatCardModule,
   MatButtonModule,
+  MatTooltipModule,
 } from "@angular/material";
 import { MatMenuModule } from "@angular/material/menu";
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { HighlightSearch } from './pipes/HighlightSearch';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, HighlightSearch],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -26,7 +30,10 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     MatMenuModule,
     BrowserAnimationsModule,
     MatCheckboxModule,
-    MatButtonModule
+    MatButtonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatTooltipModule
   ],
   exports: [
     MatIconModule,
@@ -35,7 +42,10 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     MatMenuModule,
     MatButtonModule,
     MatCardModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatTooltipModule,
+    BrowserAnimationsModule,
+    HighlightSearch
   ],
   providers: [],
   bootstrap: [AppComponent],

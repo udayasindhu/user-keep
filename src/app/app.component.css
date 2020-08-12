@@ -52,3 +52,7 @@ input[type="checkbox"]:checked + label {
   color: gray;
   text-decoration:line-through
 }
+
+.searchText {
+  background-color: yellow;
+}

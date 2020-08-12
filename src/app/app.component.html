@@ -3,123 +3,91 @@
     <mat-icon class="menu">menu</mat-icon>
     <img src="../assets/images/icon.png" style="width: 40px; height: 40px;" />
     <div class="keep">Keep</div>
-    <div
-      class="form-group has-search"
-      style="max-width: 720px; min-width: 320px; width: 85%; margin-left: 50px;"
-    >
+    <div class="has-search" style="max-width: 720px; min-width: 320px; width: 85%; margin-left: 50px;">
       <span class="fa fa-search form-control-feedback"></span>
-      <input
-        type="text"
-        class="form-control search"
-        id="search"
-        placeholder="Search"
-        (click)="changeBg()"
-      />
+      <input type="text" class="form-control search" id="search" placeholder="Search" (keyup)="searchItems($event)"
+        (onfocus)="changeSearchBarColor()" />
     </div>
-    <mat-icon
-      style="
+    <mat-icon style="
         width: 48px;
         height: 48px;
         margin-left: 100px;
         margin-right: 5px;
         margin-top: 5px;
-      "
-      >refresh</mat-icon
-    >
-    <i
-      class="fa fa-th-large"
-      aria-hidden="true"
-      style="margin-left: -10px; margin-top: 10px;"
-    ></i>
+      ">refresh</mat-icon>
+    <i class="fa fa-th-large" aria-hidden="true" style="margin-left: -10px; margin-top: 10px;"></i>
     <mat-icon style="margin-left: 16px; margin-top: 5px;">settings</mat-icon>
   </div>
 </div>
-<div class="main">
-  <mat-card
-    id="matCard"
-    cass="matCard"
-    style="
+<form [formGroup]="cardForm" class="main" style="margin-top: 25px;">
+  <mat-card id="matCard" cass="matCard" style="
       background-color: oldlace;
       margin-left: 25%;
       margin-right: 25%;
       width: 50%;
       border-radius: 10px;
       box-shadow: 0px 0px 5px rgb(129, 127, 127);
-    "
-  >
+    ">
+    <div class="alert alert-danger" *ngIf="titleError"> {{titleError}} </div>
     <mat-card-title>
       <mat-form-field>
-        <mat-label
-          id="title"
-          style="
+        <mat-label id="title" style="
             color: #969799;
             font-family: 'Product Sans', Arial, sans-serif;
-          "
-          ><b>Title</b></mat-label
-        >
-        <input
-          type="text"
-          matInput
-          autocomplete="off"
-          (keyup)="removeTitle()"
-        />
+          "><b>Title</b></mat-label>
+        <input type="text" matInput autocomplete="off" (keyup)="refreshTitle()" formControlName="title"
+          maxlength="15" />
       </mat-form-field>
     </mat-card-title>
     <mat-card-subtitle>
       <mat-form-field>
-        <mat-label
-          id="subtitle"
-          style="
+        <mat-label id="content" style="
             color: #969799;
             font-family: 'Product Sans', Arial, sans-serif;
             font-size: smaller;
-          "
-          ><b>Take a note...</b></mat-label
-        >
-        <input
-          type="text"
-          matInput
-          autocomplete="off"
-          (keyup)="removeSubTitle($event)"
-        />
+          "><b>Take a note...</b></mat-label>
+        <input type="text" matInput autocomplete="off" (keyup)="addItem($event)" formControlName="content" />
       </mat-form-field>
-      <input
-        type="file"
-        name="image"
-        id="file"
-        accept="image/gif,image/jpeg,image/jpg,image/png"
-        style="display: none;"
-        (change)="loadFile($event.target.files)"
-      />
-      <label for="file" style="cursor: pointer;"
-        ><mat-icon>image</mat-icon>
-      </label>
-      <mat-icon
-        mat-icon-button
-        (click)="changeCardBg()"
-        style="cursor: pointer;"
-        >color_lens</mat-icon
-      >
-      <hr />
-      <ol *ngFor="let data of addedMenu">
+
+      <ol *ngFor="let item of addedItems; let i = index;">
         <input type="checkbox" name="menu" id="menu" />
-        <label for="menu" style="margin-left: 5px;">{{ data }}</label>
-        <mat-icon (click)="removeItem(data)">close</mat-icon>
+        <label for="menu" style="margin-left: 5px;">{{ item.text }}</label>
+        <mat-icon style="cursor: pointer;" (click)="removeItem(i)">close</mat-icon>
       </ol>
-    </mat-card-subtitle>
-    <mat-card-content>
-      <img
-        mat-card-image
-        *ngIf="imageUrl"
-        [src]="imageUrl"
-        class="image"
-        style="
+      <img mat-card-image *ngIf="imageUrl" [src]="imageUrl" class="image" style="
           width: 50%;
           margin-left: 25%;
           margin-right: 25%;
           margin-top: 30px;
-        "
-      />
+        " />
+      <hr />
+      <div style="margin-left: 20px">
+        <input type="file" name="image" id="file" accept="image/gif,image/jpeg,image/jpg,image/png"
+          style="display: none;" (change)="loadImage($event.target.files)" />
+        <label for="file" style="cursor: pointer;">
+          <mat-icon>image</mat-icon>
+        </label>
+        <mat-icon mat-icon-button (click)="changeCardBg()" style="cursor: pointer;">color_lens</mat-icon>
+        <button class="btn" type="button" (click)="close()" style="float: right;">Close</button>
+      </div>
+    </mat-card-subtitle>
+  </mat-card>
+</form>
+<div style="width: 20%;margin:30px;float: left;" *ngFor="let card of cardsList">
+  <mat-card class="example-card" style="box-shadow: 0px 0px 9px 1px rgba(0,0,0,0.60);">
+    <mat-card-header>
+      <mat-card-title style="font-size: 20px;" [innerHTML]="card.title | highlightSearch: searchText">{{card.title}}
+      </mat-card-title>
+      <mat-icon style="cursor: pointer;" (click)="removeCard(card)">close</mat-icon>
+    </mat-card-header>
+    <img mat-card-image style="width:150px;height:150px;margin-left: 15%;" src="{{card.image}}" alt="Image"
+      *ngIf="card.displayImg">
+    <mat-card-content>
+      <ol *ngFor="let content of card.content">
+        <input type="checkbox" name="menu" id="menu" />
+        <label for="menu" style="margin-left: 5px;"
+          [innerHTML]="content.text | highlightSearch: searchText">{{content.text}}</label>
+      </ol>
     </mat-card-content>
   </mat-card>
 </div>
